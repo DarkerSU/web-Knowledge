@@ -1,0 +1,30 @@
+module.exports = {
+    title: '前端知识集锦',  // 设置网站标题
+    description: '前端知识集锦',
+    // port: "8080",
+    head: [
+      ["link", { rel: "icon", href: "/img/logo.png" }],
+      ["link", { rel: "stylesheet", href: "/css/style.css" }],
+    ],
+    markdown: {
+      lineNumbers: true,
+    },
+    themeConfig: {
+      nav: require("./nav.js"),
+      sidebar: require("./sidebar.js"),
+      collapsable:true,
+      // sidebarDepth: 2,
+      lastUpdated: "Last Updated",
+      searchMaxSuggestoins: 10,
+      serviceWorker: {
+        updatePopup: {
+          message: "有新的内容.",
+          buttonText: "更新",
+        },
+      },
+      editLinks: true,
+      editLinkText: "在 GitHub 上编辑此页 ！",
+    },
+  
+  };
+  
