@@ -3,7 +3,7 @@ home: true
 heroImage: /img/big-logo.png
 actionText: 个人笔记 →
 heroText: 我的主页
-actionLink: /guide/
+actionLink: /interview/
 features:
 - title: 简洁至上
   details: 使用最简单清晰的话语编写博客。
