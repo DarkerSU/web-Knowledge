@@ -1,3 +1,25 @@
+## JS 6种继承方式比较
+
+[6种继承方式]: https://m.html.cn/qa/javascript/10937.html
+
+#### 1、原型链继承
+
+#### 2、构造函数继承
+
+#### 3、组合继承
+
+#### 4、原型式继承
+
+#### 5、寄生式继承
+
+#### 6、寄生组合式继承
+
+## JS多态实现
+
+
+
+
+
 ## 防抖节流
 
 ```javascript
@@ -169,3 +191,20 @@ console.log(NewArr3)
 ### 4、其他方法
 
 [代码件仓库WebDemoLibrary-面试题]: https://gitee.com/darkersu/WebDemoLibrary/tree/master/.%E9%9D%A2%E8%AF%95%E9%A2%9
+
+## CommonJS和ES6的module的区别
+
+#### CommonJS
+
+`CommonJS` 模块加载过程是同步阻塞性地加载，在模块代码被运行前就已经写入了 `cache`，同一个模块被多次 `require` 时只会执行一次，重复的 `require` 得到的是相同的 `exports` 引用。
+
+#### ES6 模块
+
+使用 `import`, `export` 关键字来进行模块输入输出。`ES6` 不再是使用闭包和函数封装的方式进行模块化，而是从语法层面提供了模块化的功能。
+
+ES6模块中不存在 `require`, `module.exports`, `__filename` 等变量，`CommonJS` 中也不能使用 `import`。
+
+两种规范是不兼容的，一般来说平日里写的 `ES6` 模块代码最终都会经由 `Babel`, `Typescript` 等工具处理成 CommonJS 代码。
+
+
+

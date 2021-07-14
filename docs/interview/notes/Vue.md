@@ -236,6 +236,29 @@ Proxy 可以劫持整个对象,并返回一个新的对象。Proxy 不仅可以�
 
 :::
 
+
+
+## vue与react虚拟dom对比
+
+::: tip 相同点
+
+vue和react都采用了虚拟dom算法，以最小化更新真实DOM，从而减小不必要的性能损耗。
+
+按颗粒度分为tree diff, component diff, element diff. tree diff 比较同层级dom节点，进行增、删、移操作。如果遇到component， 就会重新tree diff流程。
+
+:::
+
+::: tip 不同点
+
+react 会自顶向下全diff.
+
+vue会跟踪每一个组件的依赖关系,不需要重新渲染整个组件树。
+
+1. 在react中，当状态发生改变时，组件树就会自顶向下的全diff, 重新render页面， 重新生成新的虚拟dom tree, 新旧dom tree进行比较， 进行patch打补丁方式，局部跟新dom. 所以react为了避免父组件跟新而引起不必要的子组件更新， 可以在shouldComponentUpdate做逻辑判断，减少没必要的render， 以及重新生成虚拟dom，做差量对比过程.
+2. 在 vue中， 通过Object.defineProperty 把这些 data 属性 全部转为 getter/setter。同时watcher实例对象会在组件渲染时，将属性记录为dep, 当dep 项中的 setter被调用时，通知watch重新计算，使得关联组件更新。
+
+:::
+
 ## 对 Vue 项目进行哪些优化？
 
 （1）代码层面的优化
