@@ -1,6 +1,7 @@
 module.exports = {
     title: '前端知识集锦',  // 设置网站标题
     description: '前端知识集锦',
+    base:'/web-Knowledge/',
     // port: "8080",
     head: [
       ["link", { rel: "icon", href: "/img/logo.png" }],
