@@ -12,7 +12,8 @@ HTML声明：
 
 HTML5声明：
 
-<!Doctype html>
+`<!Doctype html>`
+
 
 :::
 

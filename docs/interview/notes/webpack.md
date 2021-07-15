@@ -27,9 +27,7 @@
 
 ​	loader虽然是扩展了 webpack ，但是它只专注于转化文件（transform）这一个领域，完成压缩，打包，语言翻译。
 
-​	loader是运行在NodeJS中。
-
-仅仅是为了打包
+​	loader是运行在NodeJS中。仅仅是为了打包
 
 :::
 

@@ -1,3 +1,60 @@
+## Generator 函数
+
+在Javascript中，一个函数一旦开始执行，就会运行到最后或遇到return时结束，运行期间不会有其它代码能够打断它，也不能从外部再传入值到函数体内。而Generator函数（生成器）的出现使得打破函数的完整运行成为了可能，其语法行为与传统函数完全不同
+
+Generator函数是ES6提供的一种异步编程解决方案，形式上也是一个普通函数，但有几个显著的特征：
+
+- function关键字与函数名之间有一个星号 "*" （推荐紧挨着function关键字）
+- 函数体内使用 yield 表达式，定义不同的内部状态 （可以有多个yield）
+- 直接调用 Generator函数并不会执行，也不会返回运行结果，而是返回一个遍历器对象（Iterator Object）
+- 依次调用遍历器对象的next方法，遍历 Generator函数内部的每一个状态
+
+```js
+// 传统函数
+function foo() {
+    return 'hello world'
+}
+foo()   // 'hello world'，一旦调用立即执行
+
+// Generator函数
+function* generator() {
+  var y=2*(yield(x+1));
+  var z=yield(y/3);
+  return (x+y+z);
+}
+ 
+var a=generator(5);
+console.log(a.next()); //6
+console.log(a.next(12));	//4
+console.log(a.next(13));	//6+4+3 42
+```
+
+::: tip **yield 表达式**
+
+yield 表达式只能用在 Generator 函数里面，用在其它地方都会报错;
+
+yield 表达式如果用在另一个表达式中，必须放在圆括号里面。
+
+yield 表达式用作参数或放在赋值表达式的右边，可以不加括号
+
+:::
+
+
+
+**yield 和return的区别**
+
+ 相似：都能返回紧跟在语句后面的那个表达式的值
+
+  区别：
+
+   -- 每次遇到 yield，函数就暂停执行，下一次再从该位置继续向后执行；而 return 语句不具备记忆位置的功能
+
+   -- 一个函数只能执行一次 return 语句，而在 Generator 函数中可以有任意多个 yield。
+
+**next() 方法的参数**
+
+
+
 ## JS 6种继承方式比较
 
 [6种继承方式]: https://m.html.cn/qa/javascript/10937.html

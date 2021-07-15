@@ -1,4 +1,4 @@
-## 数据类型
+## JS数据类型
 
 **基本数据类型**（值类型）：
 
@@ -6,7 +6,7 @@
 
 String 字符串
 
-Number 数值
+Number 数值JS
 
 Boolean 布尔值
 
@@ -37,11 +37,98 @@ console.log(typeof b) //string
 console.log(typeof c) //string
 ```
 
-## null 和 undefined区别
+## let var const 的区别
+
+var: 解析器在对js解析时，会将脚本扫描一遍，将变量的声明提前到代码块的顶部，赋值还是在原先的位置，若在赋值前调用，就会出现暂时性死区，值为 undefined
+
+let const：不存在在变量提升，且作用域是存在于块级作用域下，所以这两个的出现解决了变量提升的问题，同时引用块级作用域。
+
+注：变量提升的原因是为了解决函数互相调用的问题。
+
+## null和undefined的区别
 
 null 空值
 
 underfind：未定义，声明了但是未初始化（为赋值）。
+
+## typeof和 instanceof 的区别
+
+typeof(a) 用于返回值的类型；
+
+instanceof 用于判断该对象是否是目标实例，根据原型链 `__proto__` 逐层向上查找，通过 instanceof 也可以判断一个实例是否是其父类型或者祖先类型的实例。
+
+```js
+function person() {
+    this.name = 10
+}
+console.log(person instanceof person)
+//结果是 false ，看下 person 函数的原型链 person.proto_ => Function.proto=> Object.proto=> null ，所以在原型链上是找不到 person 的
+```
+
+## class 和 function 的区别
+
+class 也是一个语法糖，本质还是基于原型链，class 语义化和编码上更加符合面向对象的思维。
+
+对于 function 可以用 call apply bind 的方式来改变他的执行上下文，但是 class 却不可以。
+
+::: tip **class**
+
+class 虽然本质上也是一个函数，但在转成 es5 （babel）做了一层代理，来禁止了这种行为。
+
+class 中定义的方法不可用 Object.keys() 遍历
+
+class 不可以定义私有的属性和方法， function 可以，只要不挂载在 this 作用域下就行
+
+class 只能通过类名调用
+
+class 的静态方法，this 指向类而非实例
+
+:::
+
+## toString 和 valueOf 有什么区别
+
+**toString**   方法返回一个表示该对象的字符串，如果是对象会toString() 返回 “[object type]”,其中type是对象类型。
+
+**valueOf **  方法返回指定对象的原始值，JS会利用 valueOf() 方法用来把对象转换成原始类型的值（数值、字符串和布尔值）
+
+例如：
+
+```js
+var array = ['aa','bb','cc'];
+console.log(array.toString());	 //aa,bb,cc
+console.log(array.valueOf());	//["aa","bb","cc"]
+
+var  boolean= new Boolean();
+console.log(boolean.toString());	//false
+console.log(boolean.valueOf());	//true
+
+var today = new Date();
+console.log(today.toString());	//标准时间
+console.log(today.valueOf())	//毫秒数
+
+var num = 123;
+console.log(num.toString());	//123
+console.log(num.valueOf());	//123
+
+var x = 'hello';
+console.log(x.toString());	//hello
+console.log(x.valueOf());	//hello
+
+var fn= function(){ console.log(1) };
+console.log(fn.toString());	//function(){ console.log(1) };
+console.log(fn.valueOf());	//f(){console.log(1)}
+
+var obj={};
+console.log(obj.toString());	//[object object]
+console.log(obj.valueOf());	//{}
+```
+
+## 判断数组的几种方法
+
+- Array.isArray() ES6 api
+- obj instanceof Array 原型链查找
+- obj.constructor === Array 构造函数类型判断
+- Object.prototype.toString.call(obj) === '[object Array]'    toString返回表示该对象的字符串，若这个方法没有被覆盖，那么默认返回 "[object type]" ，其中 type 是对象的类型。需要准确判断类型的话，建议使用这种方法.
 
 ## for、forEach 、for in、for of循环详解
 
@@ -65,6 +152,200 @@ forEach循环，跟for循环有点相似，不过会更优美，可通过参数�
 
 因为能够被for...of正常遍历的，都需要实现一个遍历器Iterator。而数组、字符串、Set、Map结构，早就内置好了Iterator（迭代器），它们的原型中都有一个Symbol.iterator方法，而Object对象并没有实现这个接口，使得它无法被for...of遍历。例如：
 如下
+
+## 为何for of不能遍历对象?
+
+​	因为能够被for...of正常遍历的，都需要实现一个遍历器Iterator（迭代器）。而数组、字符串、Set、Map结构，早就内置好了Iterator，它们的原型中都有一个Symbol.iterator方法，而Object对象并没有实现这个接口，使得它无法被for...of遍历。
+
+```javascript
+Array.prototype[Symbol.iterator];
+// ƒ values() { [native code] }
+ 
+String.prototype[Symbol.iterator];
+// ƒ [Symbol.iterator]() { [native code] }
+ 
+Set.prototype[Symbol.iterator];
+// ƒ values() { [native code] }
+ 
+Map.prototype[Symbol.iterator];
+// ƒ entries() { [native code] }
+ 
+Object.prototype[Symbol.iterator];
+// undefined
+```
+
+## Set、Map、WeakSet、WeakMap 的区别?
+
+> Set 和 Map 主要的应用场景在于 数据重组 和 数据储存
+
+### 1、Set和weakSet
+
+#### 1.1、Set
+
+Set 本身是一种构造函数，用来生成 Set 数据结构。
+
+(1)成员不能重复
+
+(2)只有键值对，没有键名，有点类似数组。
+
+(3)可以遍历，方法有add, delete,has.
+
+```js
+// 去重数组的重复对象
+let arr = [1, 2, 3, 2, 1, 1]
+[... new Set(arr)]	// [1, 2, 3]
+```
+
+::: tip 方法
+
+size: 返回集合的元素个数。（类似数组的长度length）
+
+add(value): 向集合中添加一个元素value。注意：如果向集合中添加一个已经存在的元素，不报错但是集合不会改变。
+
+delete(value): 从集合中删除元素value。
+
+has(value): 判断value是否在集合中，返回true或false.
+
+clear(): 清除所有成员，没有返回值。
+
+:::
+
+::: tip set应用
+
+```js
+//数组去重
+let arry = [1, 2, 3, 4, 4,1,2,3,2];
+var mySet = new Set(arry);
+let newArry = [...mySet]; // [1, 2, 3, 4]
+
+//set求并集
+let arryA= [2,3,4,5,6],arryB = [3,4,5,6,7,8];
+let setAB = new Set([...arryA,...arryB]);
+let newArryAB = [...setAB];
+console.log(newArryAB); //[2,3,4,5,6,7,8]
+
+//求交集
+let arryC= [2,3,4,5,6],arryD = [3,4,5,6,7,8];
+let setC = new Set(arryC);
+let setD = new Set(arryD);
+let newArryC_D = arryA.filter(x=>setD.has(x));
+console.log(newArryC_D); //[3,4,5,6]
+
+//求差集
+let newArryD_C = arryA.filter(x=>!setD.has(x));
+let newArryD_D = arryB.filter(x=>!setC.has(x));
+let newArryCD = [...newArryD_C,...newArryD_D];
+console.log(newArryCD); //[2,7,8]
+
+```
+
+:::
+
+#### 1.2、WeakSet
+
+和Set结构类似，也是不重复的值的集合，但WeakSet的成员只能是对象。
+
+WeakSet的API：add() //增 ；delete() //删； has() //是否存在
+
+注意：ws没有size属性，不可遍历。因为WeakSet的成员都是弱引用，随时可能消失，成员是不稳定的。
+
+::: tip **用处**
+
+（1）使用ws储存DOM节点，就不用担心节点从文档移除时，会引发内存泄漏（即在被移除的节点上绑定的click等事件）。
+
+（2）下面代码保证了Foo的实例方法，只能在Foo的实例上调用。这里使用 WeakSet 的好处是，foos对实例的引用，不会被计入内存回收机制，所以删除实例的时候，不用考虑foos，也不会出现内存泄漏。
+
+:::
+
+### 2、Map和weakMap
+
+#### 2.1、Map
+
+Map解决的是Object的键值对中键只能是字符串的问题。
+
+Map本质上是键值对的集合，类似集合；
+
+(1)成员都是对象
+
+(2)成员都是弱引用，随时可以消失。 可以用来保存DOM节点，不容易造成内存泄漏
+
+(3)不能遍历，方法有add, delete,has
+
+```js
+let myMap = new Map([
+    ["key1", "value1"],
+    ["key2", "value2"]
+]); 
+```
+
+::: tip 方法
+
+size: 属性，取出字典的长度
+
+set(key, value)：向字典中添加新元素
+
+get(key)：通过键查找特定的数值并返回
+
+has(key)：判断字典中是否存在键key
+
+delete(key)：通过键 key 从字典中移除对应的数据
+
+clear()：将这个字典中的所有元素删除
+
+:::
+
+::: error **Object的区别：**
+
+一个 Object 的键只能是字符串或者 Symbols，但一个 Map 的键可以是任意值。
+
+Map 中的键值是有序的（FIFO 原则），而添加到对象中的键则不是。
+
+Map 的键值对个数可以从 size 属性获取，而 Object 的键值对个数只能手动计算。
+
+Object 都有自己的原型，原型链上的键名有可能和你自己在对象上的设置的键名产生冲突,而map健不可重复，如果键名冲突则会覆盖对应的值。
+
+:::
+
+map的遍历
+
+```js
+let map=new Map([['F','no'],['T','yes']]);
+for(let key of map.keys()){
+    console.log(key);
+} 
+//F
+//T
+map.keys();
+//MapIterator {"F", "T"}
+map.values()
+//MapIterator {"no", "true"}
+for(let value of map.values()){
+    console.log(value);
+}
+//no
+//yes
+for(let [key,value] of map.entries()){
+    console.log(key,value);
+}
+//F no
+//T yes
+
+map.forEach((value,key)=>{
+      console.log("key:"+JSON.stringify(key)+"-------value:"+JSON.stringify(value))
+  })
+```
+
+#### 2.2、WeakMap
+
+WeakMap结构与Map结构基本类似，唯一的区别就是WeakMap只接受对象作为键名（null除外），而且键名所指向的对象不计入垃圾回收机制。
+
+(1)直接受对象作为键名（null除外），不接受其他类型的值作为键名
+
+(2)键名所指向的对象，不计入垃圾回收机制
+
+(3)不能遍历，方法同get,set,has,delete
+
+
 
 ## ES6新特性
 
@@ -180,6 +461,16 @@ console.log(...map.values())
 	//函数体
 }();
 ```
+
+## 构造函数
+
+构造函数与普通函数在编码上没有区别，只要可以通过 new 来调用的就是构造函数。
+
+::: error  注：
+
+箭头函数不可以作为构造函数。
+
+:::
 
 ## 创建自定义对象的几种方法
 
