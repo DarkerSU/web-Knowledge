@@ -1,7 +1,7 @@
 module.exports = [
-    // {
-    //     text: '博客笔记', link: '/blog/'
-    // },
+    {
+        text: '开发应用', link: '/blog/'
+    },
     {
         text: '面试集锦',
         link: '/interview/',

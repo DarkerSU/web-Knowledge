@@ -22,7 +22,7 @@ module.exports = [
         ],
     },
     {
-        title: "javascript",
+        title: "JavaScript",
         collapsable: true,
         children: [
             { title: "Javascript基础", path: "/interview/notes/javascript/javascript-basic", },
@@ -32,7 +32,10 @@ module.exports = [
     {
         title: "Vue",
         collapsable: true,
-        children: [{ title: "Vue基础", path: "/interview/notes/Vue", },
+        children: [
+            { title: "Vue基础", path: "/interview/notes/vue/Vue" },
+            { title: "Vue-router", path: "/interview/notes/vue/Vue-router" },
+            { title: "Vue-router", path: "/interview/notes/vue/Vue-router" }
         ],
     },
     {
@@ -48,10 +51,15 @@ module.exports = [
         ],
     },
     {
-        title: "webpack",
+        title: "Webpack",
         collapsable: true,
         children: [{ title: "webpack基础", path: "/interview/notes/webpack", },
         ],
     },
-
+    {
+        title: "算法",
+        collapsable: true,
+        children: [{ title: "算法面试题", path: "/interview/notes/算法", },
+        ],
+    },
 ];

@@ -16,6 +16,34 @@ Model 和 View 并无直接关联，而是通过 ViewModel 来进行联系的，
 
 这种模式实现了 Model 和 View 的数据自动同步，因此开发者只需要专注对数据的维护操作即可，而不需要自己操作 dom。
 
+## vue响应式原理
+
+**vue2.x**
+
+::: tip Vue2.x
+
+当创建 Vue 实例时,vue 会遍历 data 选项的属性,利用 Object.defineProperty 为属性添加 getter 和 setter 对数据的读取进行劫持（getter 用来依赖收集,setter 用来派发更新）,并且在内部追踪依赖,在属性被访问和修改时通知变化。
+
+每个组件实例会有相应的 watcher 实例,会在组件渲染的过程中记录依赖的所有数据属性（进行依赖收集,还有 computed watcher,user watcher 实例）,之后依赖项被改动时,setter 方法会通知依赖与此 data 的 watcher 实例重新计算（派发更新）,从而使它关联的组件重新渲染。
+
+一句话总结：
+
+vue.js 采用数据劫持结合发布-订阅模式,通过 Object.defineproperty 来劫持各个属性的 setter,getter,在数据变动时发布消息给订阅者,触发响应的监听回调。
+
+:::
+
+**Vue3.x**
+
+::: tip Vue3.x
+
+Object.defineProperty 只能劫持对象的属性,因此我们需要对每个对象的每个属性进行遍历。
+
+Vue 2.x 里,是通过 递归 + 遍历 data 对象来实现对数据的监控的,如果属性值也是对象那么需要深度遍历,显然如果能劫持一个完整的对象是才是更好的选择。
+
+Proxy 可以劫持整个对象,并返回一个新的对象。Proxy 不仅可以代理对象,还可以代理数组。还可以代理动态增加的属性。
+
+:::
+
 ## Vue单页面的优缺点
 
 优点：前后端分离用户体验好一个字快内容改变不需要重新加载整个页面
@@ -63,16 +91,28 @@ ViewModel理解
 总结：
 
 1. 永远不要把 `v-if` 和 `v-for` 同时用在同一个元素上，带来性能方面的浪费（每次渲染都会先循环再进行条件判断）
-2. 如果避免出现这种情况，则在外层嵌套`template`（页面渲染不生成`dom`节点），在这一层进行v-if判断，然后在内部进行v-for循环
+2. 如果避免出现这种情况，则在外层嵌套`template`（页面渲染不生成`dom`节点），在这一层进行v-if判断，然后在内部进行v-for循环。
 
-## computed 和 watch 比较？
+## Vue 中的 key 的作用？
+
+```
+key 是给每一个 vnode 的唯一 id,依靠 key,我们的 diff 操作可以更准确、更快速 (对于简单列表页渲染来说 diff 节点也更快,但会产生一些隐藏的副作用,比如可能不会产生过渡效果,或者在某些节点有绑定数据（表单）状态，会出现状态错位。)
+```
+
+
+```
+diff 算法的过程中,先会进行新旧节点的首尾交叉对比,当无法匹配的时候会用新节点的 key 与旧节点进行比对,从而找到相应旧节点.
+```
+
+
+## computed和 watch比较？
 
 ::: tip 区别
 
 - computed： 是计算属性，依赖其它属性值，并且 computed 的值有缓存，只有它依赖的属性值发生改变，下一次获取 computed 的值时才会重新计算 computed 的值；
 - watch： 更多的是「观察」的作用，类似于某些数据的监听回调 ，每当监听的数据变化时都会执行回调进行后续操作；
 
-::: 
+:::
 
 ::: tip 运用场景
 
@@ -102,21 +142,7 @@ keep-alive 是 Vue 内置的一个组件，可以使被包含的组件保留状�
 - 提供 include 和 exclude 属性，两者都支持字符串或正则表达式， include 表示只有名称匹配的组件会被缓存，exclude 表示任何名称匹配的组件都不会被缓存 ，其中 exclude 的优先级比 include 高；
 - 对应两个钩子函数 activated 和 deactivated ，当组件被激活时，触发钩子函数 activated，当组件被移除时，触发钩子函数 deactivated。
 
-## Vuex
 
-Vuex是一个专为vue.js应用程序开发的状态管理模式，通过创建一个集中的数据存储，方便程序中的所有组件进行访问，简单来说vuex就是vue的状态管理工具
-
-Vuex有五个属性state、getters、mutations、actions、modules。
-
-State就是数据源存放地，对应一般vue对象的data，state里面存放的数据是响应式的，state数据发生改变，对应这个数据的组件也会发生改变用this.$store.state.xxx调用；
-
-Getters相当于store的计算属性，主要是对state中数据的过滤，用this.$store.getters.xxx调用；
-
-Mutations处理数据逻辑的方法全部放在mutations中，当触发事件想改变state数据的时候使用mutations，用this.$store.commit调用，给这个方法添加一个参数，就是mutation的载荷（payload）；
-
-Actions异步操作数据，但是是通过mutation来操作用this.$store.dispatch来触发，actions也支持载荷
-
-使用场景：组件之间的状态，登录状态，加入购物车，音乐播放
 
 ## 组件间通信有哪几种方式？
 
@@ -137,7 +163,7 @@ Vue 组件间通信只要指以下 3 类通信：父子组件通信、隔代组�
 
 **（3）`EventBus （$emit / $on）`适用于 父子、隔代、兄弟组件通信**
 
-::: tip 
+::: tip
 
 这种方法通过一个空的 Vue 实例作为中央事件总线（事件中心），用它来触发事件和监听事件，从而实现任何组件间的通信，包括父子、隔代、兄弟组件。
 
@@ -148,7 +174,6 @@ Vue 组件间通信只要指以下 3 类通信：父子组件通信、隔代组�
 ::: tip
 
 - `$attrs`：包含了父作用域中不被 prop 所识别 (且获取) 的特性绑定 ( class 和 style 除外 )。当一个组件没有声明任何 prop 时，这里会包含所有父作用域的绑定 ( class 和 style 除外 )，并且可以通过 `v-bind="$attrs"`传入内部组件。通常配合 inheritAttrs 选项一起使用
-
 - `$listeners`：包含了父作用域中的 (不含 .native 修饰器的) v-on 事件监听器。它可以通过 `v-on="$listeners"`传入内部组件
 
 :::
@@ -163,7 +188,7 @@ Vue 组件间通信只要指以下 3 类通信：父子组件通信、隔代组�
 
 **（6）`Vuex`适用于 父子、隔代、兄弟组件通信**
 
-::: tip 
+::: tip
 
 - Vuex 是一个专为 Vue.js 应用程序开发的状态管理模式。每一个 Vuex 应用的核心就是 store（仓库）。“store” 基本上就是一个容器，它包含着你的应用中大部分的状态 ( state )。
 - Vuex 的状态存储是响应式的。当 Vue 组件从 store 中读取状态的时候，若 store 中的状态发生变化，那么相应的组件也会相应地得到高效更新。
@@ -171,35 +196,78 @@ Vue 组件间通信只要指以下 3 类通信：父子组件通信、隔代组�
 
 :::
 
-## vue-router 路由模式？
-
-vue-router 有 3 种路由模式：hash、history、abstract，对应的源码如下所示：
-
-```javascript
-switch (mode) {
-  case 'history':
-    this.history = new HTML5History(this, options.base)
-    break
-  case 'hash':
-    this.history = new HashHistory(this, options.base, this.fallback)
-    break
-  case 'abstract':
-    this.history = new AbstractHistory(this, options.base)
-    break
-  default:
-    if (process.env.NODE_ENV !== 'production') {
-      assert(false, `invalid mode: ${mode}`)
-    }
-}
-```
-
-其中，3 种路由模式的说明如下：
-
-- hash: 使用 URL hash 值来作路由。支持所有浏览器，包括不支持 HTML5 History Api 的浏览器；
-- history : 依赖 HTML5 History API 和服务器配置。具体可以查看 HTML5 History 模式；
-- abstract : 支持所有 JavaScript 运行环境，如 Node.js 服务器端。如果发现没有浏览器的 API，路由会自动强制进入这个模式.
 
 ## $NextTick是什么？
+
+nextTick()，是将回调函数延迟在下一次dom更新数据后调用，简单的理解是：当数据更新了，在dom中渲染后，自动执行该函数，
+
+#### 1、何时需要**Vue.nextTick()**？
+
+::: tip 场景1
+
+1. Vue生命周期的created()钩子函数进行的DOM操作一定要放在Vue.nextTick()的回调函数中，原因是在created()钩子函数执行的时候DOM 其实并未进行任何渲染，而此时进行DOM操作无异于徒劳，所以此处一定要将DOM操作的js代码放进Vue.nextTick()的回调函数中。与之对应的就是mounted钩子函数，因为该钩子函数执行时所有的DOM挂载已完成。
+
+```js
+created(){
+    let that=this;
+    that.$nextTick(function(){  //不使用this.$nextTick()方法会报错
+        that.$refs.aa.innerHTML="created中更改了按钮内容";  //写入到DOM元素
+    });
+},
+```
+
+:::
+
+::: tip 场景2
+
+2. 当项目中你想在**改变DOM元素的数据后**基于新的dom做点什么，**对新DOM一系列的js操作都需要放进Vue.nextTick()的回调函数中；**通俗的理解是：更改数据后当你想立即使用js操作新的视图的时候需要使用它
+
+```js
+<template>
+  <div class="hello">
+    <h3 id="h">{{testMsg}}</h3>
+  </div>
+</template>
+ 
+<script>
+export default {
+  name: 'HelloWorld',
+  data () {
+    return {
+      testMsg:"原始值",
+    }
+  },
+  methods:{
+    changeTxt:function(){
+      let that=this;
+      that.testMsg="修改后的文本值";  //vue数据改变，改变dom结构
+      let domTxt=document.getElementById('h').innerText;  //后续js对dom的操作
+      console.log(domTxt);  //输出可以看到vue数据修改后DOM并没有立即更新，后续的dom都不是最新的
+      if(domTxt==="原始值"){
+        console.log("文本data被修改后dom内容没立即更新");
+      }else {
+        console.log("文本data被修改后dom内容被马上更新了");
+      }
+    },
+ 
+  }
+}
+</script>
+ 
+```
+
+:::
+
+::: tip 场景3
+
+3. 在使用某个第三方插件时 ，希望在vue生成的某些dom动态发生变化时重新应用该插件，也会用到该方法，这时候就需要在 $nextTick 的回调函数中执行重新应用插件的方法。
+
+:::
+
+#### 2、Vue.nextTick() 使用原理
+
+原因是，Vue是异步执行dom更新的，一旦观察到数据变化，Vue就会开启一个队列，然后把在同一个事件循环 (event loop) 当中观察到数据变化的 watcher 推送进这个队列。如果这个watcher被触发多次，只会被推送到队列一次。这种缓冲行为可以有效的去掉重复数据造成的不必要的计算和DOm操作。而在下一个事件循环时，Vue会清空队列，并进行必要的DOM更新。
+当你设置 vm.someData = 'new value'，DOM 并不会马上更新，而是在异步队列被清除，也就是下一个事件循环开始时执行更新时才会进行必要的DOM更新。如果此时你想要根据更新的 DOM 状态去做某些事情，就会出现问题。。为了在数据变化之后等待 Vue 完成更新 DOM ，可以在数据变化之后立即使用 Vue.nextTick(callback) 。这样回调函数在 DOM 更新完成后就会调用。
 
 ## data属性详解？
 
@@ -208,34 +276,12 @@ switch (mode) {
 - 根实例对象`data`可以是对象也可以是函数（根实例是单例），不会产生数据污染情况
 - 组件实例对象`data`必须为函数，目的是为了防止多个组件实例对象之间共用一个`data`，产生数据污染。采用函数的形式，`initData`时会将其作为工厂函数都会返回全新`data`对象
 
-## vue响应式原理
+## 为什么Vue3.0采用Proxy,抛弃 Object.defineProperty？
 
-**vue2.x**
-
-::: tip Vue2.x
-
-当创建 Vue 实例时,vue 会遍历 data 选项的属性,利用 Object.defineProperty 为属性添加 getter 和 setter 对数据的读取进行劫持（getter 用来依赖收集,setter 用来派发更新）,并且在内部追踪依赖,在属性被访问和修改时通知变化。
-
-每个组件实例会有相应的 watcher 实例,会在组件渲染的过程中记录依赖的所有数据属性（进行依赖收集,还有 computed watcher,user watcher 实例）,之后依赖项被改动时,setter 方法会通知依赖与此 data 的 watcher 实例重新计算（派发更新）,从而使它关联的组件重新渲染。
-
-一句话总结：
-
-vue.js 采用数据劫持结合发布-订阅模式,通过 Object.defineproperty 来劫持各个属性的 setter,getter,在数据变动时发布消息给订阅者,触发响应的监听回调。
-
-::: 
-
-**Vue3.x**
-
-::: tip Vue3.x
-
-Object.defineProperty 只能劫持对象的属性,因此我们需要对每个对象的每个属性进行遍历。
-
-Vue 2.x 里,是通过 递归 + 遍历 data 对象来实现对数据的监控的,如果属性值也是对象那么需要深度遍历,显然如果能劫持一个完整的对象是才是更好的选择。
-
-Proxy 可以劫持整个对象,并返回一个新的对象。Proxy 不仅可以代理对象,还可以代理数组。还可以代理动态增加的属性。
-
-:::
-
+```
+Object.defineProperty 只能劫持对象的属性,因此我们需要对每个对象的每个属性进行遍历。Vue 2.x 里,是通过 递归 + 遍历 data 对象来实现对数据的监控的,如果属性值也是对象那么需要深度遍历,显然如果能劫持一个完整的对象是才是更好的选择。
+		Proxy 可以劫持整个对象,并返回一个新的对象。Proxy 不仅可以代理对象,还可以代理数组。还可以代理动态增加的属性。
+```
 
 
 ## vue与react虚拟dom对比

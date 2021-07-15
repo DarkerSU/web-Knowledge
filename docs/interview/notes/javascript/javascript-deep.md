@@ -142,6 +142,72 @@ function throttle1(cf, wait) {
 - 将多维数组转成一维
 - 对象的属性求和
 
+```js
+/* 求和 */
+var arr = [1, 5, 1, 6]
+var sum = arr.reduce((prev, cur, index, array) => {
+    return prev + cur
+}, 1)
+console.log(sum)
+
+
+/* 求乘 */
+var sum1 = arr.reduce((prev, cur, index, array) => {
+    return prev * cur
+}, 1)
+console.log(sum1)
+
+
+/* 统计个数 */
+var person = [1, 3, 5, 6, 7, 83, 1, 2, 6, 7, 6]
+
+var sum2 = person.reduce((pre, cur) => {
+    if (cur in pre) {
+        pre[cur]++
+    } else {
+        pre[cur] = 1
+    }
+    return pre
+}, {})
+console.log(sum2)
+
+
+/* 数组去重 */
+var arr3 = [1, 2, 3, 4, 5, 6, 7, 8, 9, 2, 3, 4];
+
+var quchong = arr3.reduce((pre, cur) => {
+    if (!pre.includes(cur)) {
+        return pre.concat(cur)
+    } else {
+        return pre
+    }
+}, [])
+
+console.log(quchong)
+
+/* 数组扁平化 */
+var arr1 = [
+    { a: 1 },
+    [
+        { b: 2 },
+        { c: 2 },
+        [
+            { d: 1 },
+            5
+        ]
+    ]
+]
+const newArr = (arr) => {
+    return arr.reduce((pre, cur) => {
+        return pre.concat(Array.isArray(cur) ? newArr(cur) : cur)
+    }, [])
+}
+
+console.log(newArr(arr1))
+```
+
+
+
 #### map()方法重写
 
 ```javascript
@@ -188,9 +254,64 @@ var NewArr3 = arr1.forFilter(fn1)
 console.log(NewArr3)
 ```
 
-### 4、其他方法
+## WeakMap与Map
 
-[代码件仓库WebDemoLibrary-面试题]: https://gitee.com/darkersu/WebDemoLibrary/tree/master/.%E9%9D%A2%E8%AF%95%E9%A2%9
+#### Map
+
+​		Es6提供了Map数据结构，它类似于对象，也是键值对的集合，但是‘键’的范围不限于字符串，各种类型的值（包括对象）都可以作为键名。也就是说，Object结构提供了“字符串-值”的对应，Map结构提供了“值-值”的对应。是一种更完善的Hash结构实现。如果你需要‘键值对’的数据结构，Map比Object更适合。
+
+```js
+const m = new Map();
+const o = {
+     p : "Hello World",
+}
+m.set(o,"content");
+console.log(m.get(o));  //content
+console.log(m.has(o));  //true
+m.delete(o);            
+console.log(m.has(o));  //false
+```
+
+​		Map作为构造函数，也是可以接受一个数组作为参数。该数组的成员表示键值对的数组。
+
+#### WeakMap
+
+​		Weakmap结构与Map结构类似，也是用于生成键值的集合。
+
+​		WeakMap 也可以接受一个数组，作为构造函数的参数。
+
+
+
+#### 二者区别
+
+`WeakMap`只接受对象作为键名（`null`除外），不接受其他类型的值作为键名。
+
+`WeakMap`的键名所指向的对象，不计入垃圾回收机制。
+
+```js
+const wm = new WeakMap();
+
+const element = document.getElementById('example');
+
+wm.set(element, 'some information');
+wm.get(element) // "some information"
+```
+
+WeakMap的设计目的在于，有时我们想在某个对象上面存放一些数据，但是这会形成对于这个对象的引用。一旦不再需要这两个对象，我们就必须手动删除这个引用，否则垃圾回收机制就不会释放对象占用的内存。
+
+```js
+const e1 = document.getElementById("foo");
+const e2 = document.getElementById("bar");
+const arr = [
+    [e1,"foo元素"],
+     [e2,"bar元素"],
+]
+//不再使用必须手动删除引用
+arr[0] = null;
+arr[1] = null;
+```
+
+ WeakMap 就是为了解决这个问题而诞生的，它的键名所引用的对象都是弱引用，即垃圾回收机制不将该引用考虑在内。因此，只要所引用的对象的其他引用都被清除，垃圾回收机制就会释放该对象所占用的内存。也就是说，一旦不再需要，WeakMap 里面的键名对象和所对应的键值对会自动消失，不用手动删除引用。
 
 ## CommonJS和ES6的module的区别
 
