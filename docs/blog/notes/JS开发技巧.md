@@ -168,3 +168,112 @@ function getClient() {
 }
 ```
 
+## 请实现一个 Event 类，继承自此类的对象都会拥有四个方法 on, off, once 和 trigger？
+
+- \- ES6 创建类
+-  \- 自定义事件机制 
+-  \- on 添加事件监听
+-  \- off 取消事件监听
+-  \- once 事件只执行一次
+-  \- trigger 执行事件
+
+代码实现：
+
+```js
+class Event{
+    constructor(){
+        //记录所有的事件及处理函数
+        this.handler = {};
+    }
+        /**
+     * on 添加事件监听
+     * @param type 事件类型
+     * @param handler 事件处理函数
+     */
+    on=(type,handler,once=false)=>{
+        if(!(handler instanceof Function)){
+            throw new Error('handler must be a function');
+        }
+        if(!this.handler[type]){
+            this.handler[type] = [];
+        }
+ 
+        if(!this.handler[type].includes(handler)){
+            this.handler[type].push(handler);
+            if(once){
+                handler.once = true;
+            }
+        }
+        
+    }
+    /**
+     * off 取消事件监听
+     * @param type 要取消的事件类型
+     * @param handler 要取消的事件函数,如果不传则清除该类型所有函数
+     */
+    off=(type,handler)=>{
+        
+        if(!handler){
+            this.handler[type] = [];
+            return false;
+        }
+        this.handler[type]=this.handler[type].filter(fn=>handler !== fn);
+        
+    }
+    /**
+     * trigger  执行函数
+     * @param type 要执行哪个类型的函数
+     * @param eventData 事件对象
+     * @param point this执行
+     */
+    trigger=(type,eventData={},_this=this)=>{
+        this.handler[type].forEach(fn=>{
+            fn.call(_this,eventData);
+            if(fn.once){
+                this.off(type,fn);
+            }
+        })
+    }
+    /**
+     * once 该函数只执行一次
+     * @param type 事件类型
+     * @param handler 事件处理函数
+     */
+    once=(type,fn)=>{
+        this.on(type,fn,true);
+    }
+}
+```
+
+测试用例：
+
+```js
+//测试用例
+class Click extends Event{
+    constructor(el){
+        super();
+        this.el = el;
+        this.el.addEventListener('click',this.click);
+    }
+    click=(event)=>{
+        console.log(666);
+        //必须要在相应的事件函数中调用执行函数
+        this.trigger('click',event,this.el);
+    }
+}
+let box = document.getElementById('box');
+let m = new Click(box);
+m.on('click',function(event){
+    console.log('on',event,this)
+})
+m.once('click',function(){
+    console.log('once');
+})
+ 
+ 
+//补充：原生的addEventListener方法也是有once属性的，即方法只执行一次,在func后面参数对象中设置属//性once:true即可
+box.addEventListener('click',function(){
+    console.log(123);
+},{once:true})
+```
+

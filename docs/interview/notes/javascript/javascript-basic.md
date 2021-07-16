@@ -123,6 +123,18 @@ console.log(obj.toString());	//[object object]
 console.log(obj.valueOf());	//{}
 ```
 
+
+
+## generator 和 async区别
+
+Generator和async是ES6提供的新的异步解决方案。
+
+Generator函数可以理解为一个可以输出多个值的状态机。它的返回值是一个遍历器对象（Iterator），每次调用该遍历器的next方法就会输出一个值。当有多个异步操作需要按序执行时，只要在完成一个时调一次next方法即可执行下一个。不过想要自动化执行Generator函数则需要借助一些工具。
+
+async函数则是Generator函数的语法糖，它为Generator函数内置了自动执行器。用async函数写出的异步代码几乎与同步代码没有什么差别，使用async函数，不需要任何外部工具，即可写出格式优雅的异步代码。
+
+总的来说，Generator函数定义了一种新的异步模型，而async函数通过对该模型的再封装，提供了一种优雅的异步解决方案。
+
 ## 判断数组的几种方法
 
 - Array.isArray() ES6 api
@@ -841,3 +853,61 @@ array=**[].slice.call**(arrLike)
 #### 1、freeze()
 
 Object.freeze() 可以冻结一个对象，冻结之后不能向这个对象添加新的属性，不能修改其已有属性的值，不能删除已有属性，以及不能修改该对象已有属性的可枚举性、可配置性、可写性。该方法返回被冻结的对象。
+
+## Javascript异步编程的4种方法
+
+### 1、回调函数
+
+```js
+function f1(callback){
+    setTimeout(function () {
+        // f1的任务代码
+        callback();
+    }, 1000);
+}
+
+f1(f2);
+```
+
+采用这种方式，我们把同步操作变成了异步操作，f1不会堵塞程序运行，相当于先执行程序的主要逻辑，将耗时的操作推迟执行。
+
+优点：简单、容易理解和部署，
+
+缺点：不利于代码的阅读和维护，各个部分之间高度[耦合](https://en.wikipedia.org/wiki/Coupling_(computer_programming))（Coupling），流程会很混乱，而且每个任务只能指定一个回调函数。
+
+### 2、事件监听
+
+```js
+f1.on('done', f2);
+//当f1发生done事件，就执行f2。
+function f1(){
+    setTimeout(function () {
+        // f1的任务代码
+        f1.trigger('done');
+    }, 1000);
+}
+//f1.trigger('done')表示，执行完成后，立即触发done事件，从而开始执行f2。
+```
+
+优点：比较容易理解，可以绑定多个事件，每个事件可以指定多个回调函数，而且可以["去耦合"](https://en.wikipedia.org/wiki/Decoupling)（Decoupling），有利于实现[模块化](https://www.ruanyifeng.com/blog/2012/10/javascript_module.html)。
+
+缺点：整个程序都要变成事件驱动型，运行流程会变得很不清晰。
+
+### 3、发布/订阅
+
+```js
+function f1(){
+    setTimeout(function () {
+        // f1的任务代码
+        jQuery.publish("done");
+    }, 1000);
+}
+//jQuery.publish("done")的意思是，f1执行完成后，向"信号中心"jQuery发布"done"信号，从而引发f2的执行。
+//此外，f2完成执行后，也可以取消订阅（unsubscribe）。
+jQuery.unsubscribe("done", f2);
+```
+
+这种方法的性质与"事件监听"类似，但是明显优于后者。因为我们可以通过查看"消息中心"，了解存在多少信号、每个信号有多少订阅者，从而监控程序的运行。
+
+### 4、Promise对象
+

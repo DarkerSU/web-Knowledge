@@ -123,6 +123,31 @@ Accept、Accept-Language、Content-Language、Last-Event-ID、Content-Type
 
 复杂请求的CORS请求，会在正式通信之前，增加一次HTTP查询请求，称为“预检”请求（preflight）。预检请求为OPTIONS请求，用于向服务器请求权限信息。预检请求被成功响应后，才会发出真实请求，携带真实数据。
 
+## requestAnimationFrame详解
+
+requestAnimationFrame是浏览器用于定时循环操作的一个接口，类似于setTimeout，主要用途是按帧对网页进行重绘，让各种网页动画效果（DOM动画、Canvas动画、SVG动画、WebGL动画）能够有一个统一的刷新机制，从而节省系统资源，提高系统性能，改善视觉效果。
+
+在运行过程中，window.requestAnimationFrame() 告诉浏览器——你希望执行一个动画，并且要求浏览器在下次重绘之前调用指定的回调函数更新动画。该方法需要传入一个回调函数作为参数，该回调函数会在浏览器下一次重绘之前执行
+
+::: tip 优点
+
+- requestAnimationFrame 会把每一帧中的所有DOM操作集中起来，在一次重绘或回流中就完成，并且重绘或回流的时间间隔紧紧跟随浏览器的刷新频率。充分利用了显示器的刷新机制，比较节省系统资源（显示器有固定的刷新频率（60Hz或75Hz），也就是说，每秒最多只能重绘60次或75次）。
+- requestAnimationFrame是一个全局函数。调用requestAnimationFrame后，它会要求浏览器根据自己的频率进行一次重绘，它会接收一个回调函数作为参数，在浏览器即将开始重绘时，会调用这个函数，并会给这个函数传入调用回调函数时的时间作为参数。之后会反复不断地调用requestAnimationFrame，以达到动画效果；
+- 节省了CPU、GPU和电力。使用setTimeout实现的动画，当页面被隐藏或最小化时，setTimeout 仍然在后台执行动画任务，此时刷新动画是没有意义的，完全是浪费CPU等资源。而requestAnimationFrame则完全不同，当页面处理未激活的状态下，该页面的屏幕刷新任务也会被系统暂停，因此跟着系统步伐走的requestAnimationFrame也会停止渲染，当页面被激活时，动画就从上次停留的地方继续执行，有效节省了CPU、GPU和电力开销。
+
+:::
+
+
+
+::: warning 缺点
+
+- 由于requestAnimationFrame目前还存在兼容性问题，而且不同的浏览器还需要带不同的前缀。因此需要通过降级的方式对requestAnimationFrame进行封装，根据不同浏览器的情况从高级特性往低进行回退。
+- requestAnimationFrame是在主线程上完成。这意味着，如果主线程非常繁忙，requestAnimationFrame的动画效果会大打折扣。
+
+:::
+
+
+
 ## 前端性能优化
 
 ::: tip 优化方案
