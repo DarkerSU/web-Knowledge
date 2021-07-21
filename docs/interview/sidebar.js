@@ -35,7 +35,7 @@ module.exports = [
         children: [
             { title: "Vue基础", path: "/interview/notes/vue/Vue" },
             { title: "Vue-router", path: "/interview/notes/vue/Vue-router" },
-            { title: "Vue-router", path: "/interview/notes/vue/Vue-router" }
+            { title: "VueX", path: "/interview/notes/vue/VueX" }
         ],
     },
     {

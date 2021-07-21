@@ -21,4 +21,11 @@ module.exports = [
             { title: "webpack相关", path: "/blog/notes/webpack相关" }
         ],
     },
+	{
+        title: "事件循环机制，你真的了解吗？",
+        collapsable: true,
+        children: [
+            { title: "事件循环机制", path: "/blog/notes/事件循环机制" }
+        ],
+    },
 ];
