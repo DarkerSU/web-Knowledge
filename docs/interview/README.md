@@ -164,6 +164,28 @@ Webpack的强大之处不仅仅在于它统一了JS的各种模块系统，更�
 - 自动化部署
 - 自动化测试
 
+## 字节一面
+
+1.给出一个数组如何随机打乱顺序？（洗牌算法）
+
+2.js浏览器事件循环机制？
+
+3.vue 2.x和vue 3.x 在数据数据双向绑定上有什么区别？（defineProperty和Proxy）
+
+4.Nuxt.js的实现机制，如何做到数据和dom结构绑定（注入）
+
+5.写一个EventEmitter类，包括once(event, listener)、addListener(event, listener)、removeListener(event, listener)、emit(event, [arg1], [arg2], [...])
+
+https://blog.csdn.net/Judy_qiudie/article/details/82709331
+
+https://www.cnblogs.com/chrissong/p/10341219.html
+
+6.webpack和vite实现原理及区别？
+
+7.vue的diff算法是如何实现的，和react的diff算法有什么区别
+
+
+
 ## IDE
 
 > IDE (Integrated Development Environment，**集成开发环境**）是含代码编辑、关键词高亮、智能感应、智能纠错、格式美化、版本管理等功能于一身的“**高级代码编辑器**”
